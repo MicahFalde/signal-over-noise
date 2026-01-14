@@ -1,0 +1,48 @@
+.show database schema 
+
+AuthenticationEvents
+| getschema 
+
+.show tables 
+
+AuthenticationEvents
+
+AuthenticationEvents
+| project-away hostname //mailserver
+| where result == "Failed Login"
+| summarize Attempts=count() by username, src_ip, result
+| where Attempts > 2
+| sort by Attempts desc
+
+Employees
+| take 10
+
+AuthenticationEvents
+| join kind=leftouter Employees on username
+| where result == "Failed Login"
+| where role == "Trial Administrator"
+| project timestamp, username, role, company_domain, src_ip, result
+
+
+.show database schema 
+
+FileCreationEvents
+| join kind=leftouter Employees on hostname
+| take 10
+
+ProcessEvents
+| join kind=leftouter Employees on hostname
+| summarize ProcCount=count() by hostname, process_name, name
+//| take 10
+| sort by ProcCount asc
+
+ProcessEvents
+| take 100
+
+ProcessEvents
+| summarize Processes=count() by process_name
+| sort by Processes asc
+
+ProcessEvents
+| where process_name in("powershell.exe", "cmd.exe")
+| summarize count()  by process_name
